@@ -21,7 +21,10 @@ builder.Services.AddScoped<RestauranteService>();
 
 // Add Swagger/OpenAPI documentation
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "RestaurantsAPI", Version = "v1" });
+});
 
 var app = builder.Build();
 
@@ -31,7 +34,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "restaurantsapi");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "RestaurantsAPI v1");
+    });
+
+    // Redireccionar la página de inicio a Swagger
+    app.Use((context, next) =>
+    {
+        context.Response.Redirect("/swagger");
+        return Task.CompletedTask;
     });
 }
 
