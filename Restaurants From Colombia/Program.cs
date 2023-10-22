@@ -31,7 +31,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "restaurantsapi");
+        c.SwaggerEndpoint("https://restaurantsapi-dev-narf.2.us-1.fl0.io/swagger/v1/swagger.json", "restaurantsapi");
     });
 }
 
