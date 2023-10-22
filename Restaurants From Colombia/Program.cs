@@ -36,7 +36,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+// Don't need the app.Run() method.
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://*:{port}/");
+
+app.Run();
