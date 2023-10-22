@@ -26,14 +26,10 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("https://restaurantsapi-dev-narf.2.us-1.fl0.io/swagger/v1/swagger.json", "restaurantsapi");
-    });
-}
+    app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
