@@ -1,4 +1,5 @@
 using Restaurants_From_Colombia.BD;
+using Restaurants_From_Colombia.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,7 @@ var configuration = new ConfigurationBuilder()
 var mongoDBSettings = configuration.GetSection("ConnectionStrings:MongoDB").Value;
 // Register MongoDBSettings as a singleton service
 builder.Services.AddSingleton(new MongoDBSettings { MongoDBConnection = mongoDBSettings });
-
+builder.Services.AddScoped<RestauranteService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -7,7 +7,10 @@
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public ObjectId Id { get; set; }
+        public ObjectId _Id { get; set; }
+
+        [BsonElement("restaurant_id")]
+        public int IdRestaur { get; set; }
 
         [BsonElement("nombre")]
         public string Nombre { get; set; }
