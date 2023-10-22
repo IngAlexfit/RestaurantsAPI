@@ -40,7 +40,11 @@
             var restaurante = _restaurantesCollection.Find(r => r.IdRestaur == restauranteId).SingleOrDefault();
             return restaurante;
         }
-
+        public Comentario GetComentariosById(string comentarioId)
+        {
+            var comentario = _comentariosCollection.Find(c => c.Id == ObjectId.Parse(comentarioId)).SingleOrDefault();
+            return comentario;
+        }
 
 
 
@@ -50,7 +54,14 @@
             _comentariosCollection.InsertOne(comentario);
         }
 
-
+        public void IncrementarLike(string comentarioId)
+        {
+            var filter = Builders<Comentario>.Filter.Eq("_id", ObjectId.Parse(comentarioId));
+            var update = Builders<Comentario>.Update.Inc("likes", 1); // Incrementa "likes" en 1
+            _comentariosCollection.UpdateOne(filter, update);
+        }
 
     }
+    
+    
 }

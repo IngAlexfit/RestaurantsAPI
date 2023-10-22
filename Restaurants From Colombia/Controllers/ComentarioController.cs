@@ -48,7 +48,25 @@ namespace Restaurants_From_Colombia.Controllers
 
             return Ok("Comentario agregado con éxito"); 
         }
+        
+        [HttpPost("IncrementarLike")]
+        public IActionResult IncrementarLike([FromBody] string comentarioId)
+        {
+            if (!ObjectId.TryParse(comentarioId, out ObjectId objectId))
+            {
+                return BadRequest("ID de comentario no válido");
+            }
 
+            var comentario = _restauranteService.GetComentariosById(comentarioId);
+            if (comentario == null)
+            {
+                return NotFound($"No se encontró un comentario con el ID {comentarioId}");
+            }
+
+            _restauranteService.IncrementarLike(comentarioId);
+
+            return Ok("Like incrementado con éxito");
+        }
 
 
 
