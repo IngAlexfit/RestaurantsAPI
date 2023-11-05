@@ -19,6 +19,16 @@ var mongoDBSettings = configuration.GetSection("ConnectionStrings:MongoDB").Valu
 builder.Services.AddSingleton(new MongoDBSettings { MongoDBConnection = mongoDBSettings });
 builder.Services.AddScoped<RestauranteService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
 // Add Swagger/OpenAPI documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -26,7 +36,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-
+    app.UseCors();
     app.UseSwagger();
     app.UseSwaggerUI();
 
