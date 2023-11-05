@@ -35,5 +35,8 @@
 
         [BsonElement("likes")]
         public int Likes { get; set; }
+
+        [BsonElement("visitas")]
+        public int Visitas { get; set; }
     }
 }
