@@ -20,8 +20,10 @@ var configuration = new ConfigurationBuilder()
 
 var mongoDBSettings = configuration.GetSection("ConnectionStrings:MongoDB").Value;
 builder.Services.AddSingleton(new MongoDBSettings { MongoDBConnection = mongoDBSettings });
+builder.Services.AddSingleton<IConfiguration>(configuration);
 builder.Services.AddScoped<RestauranteService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ApreciacionesComentsService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

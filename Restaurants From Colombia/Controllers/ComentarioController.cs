@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using Restaurants_From_Colombia.Model;
 using Restaurants_From_Colombia.Services;
 using System;
-
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 namespace Restaurants_From_Colombia.Controllers
 {
     [Route("api/[controller]")]
@@ -13,12 +16,17 @@ namespace Restaurants_From_Colombia.Controllers
     public class ComentarioController : ControllerBase
     {
         private readonly RestauranteService _restauranteService;
+        private readonly ApreciacionesComentsService _apreciacionesComentsService;
+        private readonly IConfiguration _configuration;
 
-        public ComentarioController(RestauranteService restauranteService)
+        public ComentarioController(RestauranteService restauranteService,
+                                    ApreciacionesComentsService apreciacionesComentsService,
+                                    IConfiguration configuration)
         {
             _restauranteService = restauranteService;
+            _apreciacionesComentsService = apreciacionesComentsService;
+            _configuration = configuration;
         }
-
 
         [HttpGet("ByRestauranteId/{restauranteId}")]
         public ActionResult<IEnumerable<Comentario>> GetComentariosPorRestaurante(int restauranteId)
@@ -48,25 +56,74 @@ namespace Restaurants_From_Colombia.Controllers
 
             return Ok("Comentario agregado con éxito"); 
         }
-        
+
+        // Clase de configuración
+        public class JwtSettings
+        {
+            public string Key { get; set; }
+            public int DurationInMinutes { get; set; }
+        }
+
         [HttpPost("IncrementarLike")]
         public IActionResult IncrementarLike([FromBody] string comentarioId)
         {
-            if (!ObjectId.TryParse(comentarioId, out ObjectId objectId))
+            // Obtener token del encabezado
+            var jwtToken = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ")[1];
+
+            if (jwtToken == null)
+                return Unauthorized("Usuario no Autenticado");
+
+            // Obtener key desde configuración
+            var key = _configuration["JwtSettings:Key"];
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
             {
-                return BadRequest("ID de comentario no válido");
-            }
+                var principal = tokenHandler.ValidateToken(jwtToken,
+                          new TokenValidationParameters
+                          {
+                              ValidateIssuerSigningKey = true,
+                              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                              ValidateIssuer = false,
+                              ValidateAudience = false
+                          },
+                          out SecurityToken validatedToken);
 
-            var comentario = _restauranteService.GetComentariosById(comentarioId);
-            if (comentario == null)
+                // Obtener username del principal
+                var username = principal.Identity.Name;
+
+                if (!ObjectId.TryParse(comentarioId, out ObjectId objectId))
+                {
+                    return BadRequest("ID no válido");
+                }
+
+                if (_apreciacionesComentsService.UsuarioHaDadoLikeAComentario(username, comentarioId))
+                {
+                    return BadRequest("El usuario ya ha dado like");
+                }
+
+                var comentario = _restauranteService.GetComentariosById(comentarioId);
+
+                if (comentario == null)
+                {
+                    return NotFound($"No encontrado comentario con ID {comentarioId}");
+                }
+
+                _restauranteService.IncrementarLike(comentarioId);
+
+                _apreciacionesComentsService.RegistrarApreciacion(username, comentarioId);
+
+                return Ok("Like incrementado y apreciación registrada");
+
+            }
+            catch (SecurityTokenException e)
             {
-                return NotFound($"No se encontró un comentario con el ID {comentarioId}");
+                return Unauthorized(e.Message);
             }
-
-            _restauranteService.IncrementarLike(comentarioId);
-
-            return Ok("Like incrementado con éxito");
         }
+
+
 
 
 
