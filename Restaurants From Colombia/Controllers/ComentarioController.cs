@@ -63,9 +63,10 @@ namespace Restaurants_From_Colombia.Controllers
             public string Key { get; set; }
             public int DurationInMinutes { get; set; }
         }
+       
 
         [HttpPost("IncrementarLike")]
-        public IActionResult IncrementarLike([FromBody] string comentarioId)
+        public IActionResult IncrementarLike([FromBody] ComentarioIdModel comentarioIdModel)
         {
             // Obtener token del encabezado
             var jwtToken = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ")[1];
@@ -92,15 +93,26 @@ namespace Restaurants_From_Colombia.Controllers
 
                 // Obtener username del principal
                 var username = principal.Identity.Name;
+                // Convertir la cadena a DateTime
+                DateTime creationTime = DateTime.Parse(comentarioIdModel.creationTime);
 
-                if (!ObjectId.TryParse(comentarioId, out ObjectId objectId))
+                var comentarioId = new ObjectId(
+                  creationTime,
+                  comentarioIdModel.machine,
+                  (short)comentarioIdModel.pid, 
+                  comentarioIdModel.increment
+              );
+
+
+
+                if (comentarioId == ObjectId.Empty)
                 {
-                    return BadRequest("ID no válido");
+                    return BadRequest("ID de Comentario no válido");
                 }
 
                 if (_apreciacionesComentsService.UsuarioHaDadoLikeAComentario(username, comentarioId))
                 {
-                    return BadRequest("El usuario ya ha dado like");
+                    return BadRequest(new { message = "El usuario ya ha dado like" });
                 }
 
                 var comentario = _restauranteService.GetComentariosById(comentarioId);

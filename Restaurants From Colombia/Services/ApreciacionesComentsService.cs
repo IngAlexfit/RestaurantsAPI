@@ -16,26 +16,28 @@ namespace Restaurants_From_Colombia.Services
            
         }
 
-        public bool UsuarioHaDadoLikeAComentario(string username, string comentarioId)
+        public bool UsuarioHaDadoLikeAComentario(string username, ObjectId comentarioId)
         {
             var filter = Builders<ApreciacionComentario>.Filter.Eq("usuario", username) &
-                         Builders<ApreciacionComentario>.Filter.Eq("comentario_id", ObjectId.Parse(comentarioId));
+                         Builders<ApreciacionComentario>.Filter.Eq("comentario_id", comentarioId);
 
             var apreciacion = _apreciacionesComentsCollection.Find(filter).FirstOrDefault();
             return apreciacion != null;
         }
 
-        public void RegistrarApreciacion(string username, string comentarioId)
+
+        public void RegistrarApreciacion(string username, ObjectId comentarioId)
         {
             var apreciacion = new ApreciacionComentario
             {
                 Usuario = username,
-                ComentarioId = ObjectId.Parse(comentarioId),
+                ComentarioId = comentarioId,
                 Fecha = DateTime.UtcNow
             };
 
             _apreciacionesComentsCollection.InsertOne(apreciacion);
         }
+
     }
 
 }
