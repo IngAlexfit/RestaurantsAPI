@@ -41,20 +41,58 @@ namespace Restaurants_From_Colombia.Controllers
         [HttpPost("agregar-comentario")]
         public IActionResult AgregarComentario([FromBody] Comentario comentario)
         {
-            if (!ModelState.IsValid)
+            // Obtener token del encabezado
+            var jwtToken = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ")[1];
+
+            if (jwtToken == null)
+                return Unauthorized("Usuario no Autenticado");
+
+            // Obtener key desde configuración
+            var key = _configuration["JwtSettings:Key"];
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
             {
-                return BadRequest(ModelState);
+                var principal = tokenHandler.ValidateToken(jwtToken,
+                         new TokenValidationParameters
+                         {
+                             ValidateIssuerSigningKey = true,
+                             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                             ValidateIssuer = false,
+                             ValidateAudience = false
+                         },
+                         out SecurityToken validatedToken);
+
+                // Obtener Autor  del principal
+                var username = principal.Identity.Name;
+
+
+
+                //funcionalidad
+
+                // Asignar el usuario del token al comentario
+                comentario.Autor = username;
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                // Comprueba si el restaurante con el ID especificado existe
+                var restauranteExistente = _restauranteService.GetRestaurantePorId(comentario.restaurante_id);
+                if (restauranteExistente == null)
+                {
+                    return Ok(comentario.restaurante_id);
+                }
+                _restauranteService.AgregarComentario(comentario);
+
+                return Ok("Comentario agregado con éxito");
+            }
+            catch (SecurityTokenException e)
+            {
+                return Unauthorized(e.Message);
             }
 
-            // Comprueba si el restaurante con el ID especificado existe
-            var restauranteExistente = _restauranteService.GetRestaurantePorId(comentario.restaurante_id);
-            if (restauranteExistente == null)
-            {
-                return Ok(comentario.restaurante_id);
-            }
-            _restauranteService.AgregarComentario(comentario);
-
-            return Ok("Comentario agregado con éxito"); 
         }
 
         // Clase de configuración
