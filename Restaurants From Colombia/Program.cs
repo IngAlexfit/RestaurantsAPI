@@ -23,7 +23,7 @@ builder.Services.AddSingleton(new MongoDBSettings { MongoDBConnection = mongoDBS
 builder.Services.AddSingleton<IConfiguration>(configuration);
 builder.Services.AddScoped<RestauranteService>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<ApreciacionesComentsService>();
+builder.Services.AddScoped<ComentsService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

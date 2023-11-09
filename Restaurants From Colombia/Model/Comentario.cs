@@ -22,6 +22,9 @@ namespace Restaurants_From_Colombia.Model
         [BsonElement("likes")]
         public int Likes { get; set; } = 0;
 
+        [BsonElement("dislikes")]
+        public int Dislikes { get; set; } = 0;
+
         [Required(ErrorMessage = "El campo 'RestauranteId' es obligatorio.")]
         [BsonElement("restaurante_id")]
         public int restaurante_id { get; set; } 

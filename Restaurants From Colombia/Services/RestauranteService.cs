@@ -50,17 +50,7 @@
 
 
 
-        public void AgregarComentario(Comentario comentario)
-        {
-            _comentariosCollection.InsertOne(comentario);
-        }
-
-        public void IncrementarLike(ObjectId comentarioId)
-        {
-            var filter = Builders<Comentario>.Filter.Eq("_id", comentarioId);
-            var update = Builders<Comentario>.Update.Inc("likes", 1); // Incrementa "likes" en 1
-            _comentariosCollection.UpdateOne(filter, update);
-        }
+       
 
 
     }

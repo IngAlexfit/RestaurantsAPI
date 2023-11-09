@@ -16,15 +16,15 @@ namespace Restaurants_From_Colombia.Controllers
     public class ComentarioController : ControllerBase
     {
         private readonly RestauranteService _restauranteService;
-        private readonly ApreciacionesComentsService _apreciacionesComentsService;
+        private readonly ComentsService _comentsService;
         private readonly IConfiguration _configuration;
 
         public ComentarioController(RestauranteService restauranteService,
-                                    ApreciacionesComentsService apreciacionesComentsService,
+                                    ComentsService comentsService,
                                     IConfiguration configuration)
         {
             _restauranteService = restauranteService;
-            _apreciacionesComentsService = apreciacionesComentsService;
+            _comentsService = comentsService;
             _configuration = configuration;
         }
 
@@ -76,7 +76,7 @@ namespace Restaurants_From_Colombia.Controllers
                 {
                     return Ok(comentario.restaurante_id);
                 }
-                _restauranteService.AgregarComentario(comentario);
+                _comentsService.AgregarComentario(comentario);
 
                 return Ok("Comentario agregado con éxito");
             }
@@ -139,12 +139,6 @@ namespace Restaurants_From_Colombia.Controllers
                 {
                     return BadRequest("ID de Comentario no válido");
                 }
-
-                if (_apreciacionesComentsService.UsuarioHaDadoLikeAComentario(username, comentarioId))
-                {
-                    return BadRequest(new { message = "El usuario ya ha dado like" });
-                }
-
                 var comentario = _restauranteService.GetComentariosById(comentarioId);
 
                 if (comentario == null)
@@ -152,11 +146,29 @@ namespace Restaurants_From_Colombia.Controllers
                     return NotFound($"No encontrado comentario con ID {comentarioId}");
                 }
 
-                _restauranteService.IncrementarLike(comentarioId);
+                if (_comentsService.UsuarioHaDadoLikeAComentario(username, comentarioId))
+                {
+                    return BadRequest(new { message = "El usuario ya ha dado Like" });
+                   
 
-                _apreciacionesComentsService.RegistrarApreciacion(username, comentarioId);
 
-                return Ok("Like incrementado y apreciación registrada");
+                }
+                if (_comentsService.UsuarioHaDadoDiskLikeAComentario(username, comentarioId))
+                {
+                    _comentsService.DecrementarDiskLike(comentarioId);
+                }
+
+               
+
+
+
+                var accion = "like";
+
+                _comentsService.IncrementarLike(comentarioId);
+
+                _comentsService.RegistrarApreciacion(username, comentarioId, accion);
+
+                return Ok("like y apreciación registrada");
 
             }
             catch (SecurityTokenException e)
@@ -165,6 +177,86 @@ namespace Restaurants_From_Colombia.Controllers
             }
         }
 
+
+        [HttpPost("DarDisklike")]
+        public IActionResult DarDisklike([FromBody] ComentarioIdModel comentarioIdModel)
+        {
+            // Obtener token del encabezado
+            var jwtToken = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ")[1];
+
+            if (jwtToken == null)
+                return Unauthorized("Usuario no Autenticado");
+
+            // Obtener key desde configuración
+            var key = _configuration["JwtSettings:Key"];
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(jwtToken,
+                          new TokenValidationParameters
+                          {
+                              ValidateIssuerSigningKey = true,
+                              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                              ValidateIssuer = false,
+                              ValidateAudience = false
+                          },
+                          out SecurityToken validatedToken);
+
+                // Obtener username del principal
+                var username = principal.Identity.Name;
+                // Convertir la cadena a DateTime
+                DateTime creationTime = DateTime.Parse(comentarioIdModel.creationTime);
+
+                var comentarioId = new ObjectId(
+                  creationTime,
+                  comentarioIdModel.machine,
+                  (short)comentarioIdModel.pid,
+                  comentarioIdModel.increment
+              );
+
+
+
+                if (comentarioId == ObjectId.Empty)
+                {
+                    return BadRequest("ID de Comentario no válido");
+                }
+                var comentario = _restauranteService.GetComentariosById(comentarioId);
+
+                if (comentario == null)
+                {
+                    return NotFound($"No encontrado comentario con ID {comentarioId}");
+                }
+
+                if (_comentsService.UsuarioHaDadoDiskLikeAComentario(username, comentarioId))
+                {
+                    return BadRequest(new { message = "El usuario ya ha dado DisLike" });
+                }
+
+                if (_comentsService.UsuarioHaDadoLikeAComentario(username, comentarioId))
+                {
+                    _comentsService.DecrementarLike(comentarioId);
+
+
+                }
+
+                
+
+                var accion = "dislike";
+
+                _comentsService.IncrementarDiskLike(comentarioId);
+
+                _comentsService.RegistrarApreciacion(username, comentarioId,accion);
+
+                return Ok("Dislike  y apreciación registrada");
+
+            }
+            catch (SecurityTokenException e)
+            {
+                return Unauthorized(e.Message);
+            }
+        }
 
 
 

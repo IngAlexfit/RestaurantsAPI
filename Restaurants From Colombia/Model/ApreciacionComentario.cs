@@ -19,7 +19,8 @@ namespace Restaurants_From_Colombia.Model
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime Fecha { get; set; }
 
-
+        [BsonElement("accion")]
+        public string Accion { get; set; }
 
     }
 }
