@@ -1,16 +1,58 @@
-RestaurantsAPI
+# 🍛 API de Restaurantes de Colombia
 
-API REST para gestionar restaurantes en Colombia
-Endpoints disponibles
+Esta API permite acceder a información sobre restaurantes colombianos, incluyendo detalles como ubicación, tipos de cocina, menús y comentarios de los clientes.
 
-    /api/Restaurant: Obtener todos los restaurantes.
-    /api/Restaurant/{id}: Obtener un restaurante por su ID.
-    /api/Restaurant/byCiudad/{ciudad}: Obtener todos los restaurantes de una ciudad específica.
-    /api/Comentario: Obtener todos los comentarios de los restaurantes.
-    /api/Comentario/ByRestauranteId/{restauranteId}: Obtener todos los comentarios de un restaurante específico.
-    /api/Comentario/agregar-comentario: Agregar un nuevo comentario a un restaurante.
+## Endpoints
 
-Formato de las solicitudes y respuestas
+### Autenticación
+
+- `POST /api/Auth/login` - Inicia sesión y devuelve un token de autenticación
+
+### Restaurantes
+
+- `GET /api/Restaurant` - Obtiene todos los restaurantes
+- `GET /api/Restaurant/{id}` - Obtiene un restaurante por ID
+- `GET /api/Restaurant/byCiudad/{ciudad}` - Filtra restaurantes por ciudad
+
+### Comentarios
+
+- `GET /api/Comentario/ByRestauranteId/{restauranteId}` - Obtiene los comentarios de un restaurante
+- `POST /api/Comentario/agregar-comentario` - Agrega un nuevo comentario
+- `POST /api/Comentario/IncrementarLike` - Incrementa los "Me gusta" de un comentario
+- `POST /api/Comentario/DarDisklike` - Incrementa los "No me gusta" de un comentario
+
+## Modelos
+
+### Restaurante
+
+- `_Id` - ID del restaurante 
+- `idRestaur` - ID numérico del restaurante
+- `nombre` - Nombre del restaurante
+- `ubicacion` - Ciudad donde se encuentra
+- `tipoCocina` - Tipo de cocina (mexicana, italiana, etc)
+- `descripcion` - Descripción del restaurante
+- `imagenUrl` - URL de la imagen destacada
+- `telefono` - Teléfono de contacto
+- `horario` - Horario de atención
+- `likes` - Cantidad de "Me gusta" 
+- `visitas` - Cantidad de visitas
+
+### Comentario
+
+- `id` - ID del comentario
+- `autor` - Nombre del autor del comentario
+- `contenido` - Texto del comentario
+- `likes` - Cantidad de "Me gusta" 
+- `dislikes` - Cantidad de "No me gusta"
+- `restaurante_id` - ID del restaurante relacionado
+- `fecha` - Fecha de creación del comentario
+
+### Autenticación
+
+- `username` - Nombre de usuario
+- `password` - Contraseña 
+
+¡Pruébala y comenta tus restaurantes favoritos! ✨
 
 Todas las solicitudes y respuestas de la API están formateadas en JSON.
 Ejemplo de solicitud
