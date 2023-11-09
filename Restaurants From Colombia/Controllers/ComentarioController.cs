@@ -76,12 +76,19 @@ namespace Restaurants_From_Colombia.Controllers
                 {
                     return Ok(comentario.restaurante_id);
                 }
+                 
+                var colombiaTz = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+
+                
                 var comentarioG = new Comentario
                 {
                     Autor = comentario.Autor,
                     Contenido = comentario.Contenido,
                     restaurante_id = comentario.restaurante_id,
-                    Fecha = DateTime.Today
+
+                    // Convertir fecha UTC a zona horaria Colombia
+                    Fecha = TimeZoneInfo.ConvertTime(DateTime.UtcNow, colombiaTz)
+
                 };
 
 
