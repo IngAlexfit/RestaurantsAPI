@@ -77,7 +77,7 @@ namespace Restaurants_From_Colombia.Controllers
                     return Ok(comentario.restaurante_id);
                 }
                  
-                var colombiaTz = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+                var colombiaTz = TimeZoneInfo.FindSystemTimeZoneById("America/Bogota");
 
                 
                 var comentarioG = new Comentario
