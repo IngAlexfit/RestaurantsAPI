@@ -47,6 +47,7 @@ namespace Restaurants_From_Colombia.Controllers
             {
                 return NotFound($"No se encontró un restaurante con el ID {id}");
             }
+            _restauranteService.IncrementarVisita(id);
 
             return Ok(restaurante);
         }

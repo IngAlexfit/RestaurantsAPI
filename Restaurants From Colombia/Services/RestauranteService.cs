@@ -38,8 +38,16 @@
         public Restaurante GetRestaurantePorId(int restauranteId)
         {
             var restaurante = _restaurantesCollection.Find(r => r.IdRestaur == restauranteId).SingleOrDefault();
-            return restaurante;
+            return restaurante; 
         }
+        public void IncrementarVisita(int restauranteId)
+        {
+            var filter = Builders<Restaurante>.Filter.Eq("restaurant_id", restauranteId);
+            var update = Builders<Restaurante>.Update.Inc("visitas", 1);
+            _restaurantesCollection.UpdateOne(filter, update);
+        }
+
+
         public Comentario GetComentariosById(ObjectId comentarioId)
         {
             var comentario = _comentariosCollection.Find(c => c.Id == comentarioId).SingleOrDefault();
