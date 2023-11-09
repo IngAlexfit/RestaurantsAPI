@@ -3,9 +3,8 @@ using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
 
 namespace Restaurants_From_Colombia.Model
-{   
-
-    public class Comentario
+{
+    public class ComentarioRegisterModel
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -28,9 +27,5 @@ namespace Restaurants_From_Colombia.Model
         [Required(ErrorMessage = "El campo 'RestauranteId' es obligatorio.")]
         [BsonElement("restaurante_id")]
         public int restaurante_id { get; set; }
-
-        [BsonElement("fecha")]
-        public DateTime Fecha { get; set; }
     }
-
 }

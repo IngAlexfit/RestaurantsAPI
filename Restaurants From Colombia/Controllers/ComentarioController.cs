@@ -39,7 +39,7 @@ namespace Restaurants_From_Colombia.Controllers
 
 
         [HttpPost("agregar-comentario")]
-        public IActionResult AgregarComentario([FromBody] Comentario comentario)
+        public IActionResult AgregarComentario([FromBody] ComentarioRegisterModel comentario)
         {
             // Obtener token del encabezado
             var jwtToken = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ")[1];
@@ -76,7 +76,16 @@ namespace Restaurants_From_Colombia.Controllers
                 {
                     return Ok(comentario.restaurante_id);
                 }
-                _comentsService.AgregarComentario(comentario);
+                var comentarioG = new Comentario
+                {
+                    Autor = comentario.Autor,
+                    Contenido = comentario.Contenido,
+                    restaurante_id = comentario.restaurante_id,
+                    Fecha = DateTime.Today
+                };
+
+
+                _comentsService.AgregarComentario(comentarioG);
 
                 return Ok("Comentario agregado con éxito");
             }
