@@ -64,15 +64,7 @@ namespace Restaurants_From_Colombia.Controllers
                          },
                          out SecurityToken validatedToken);
 
-                // Obtener Autor  del principal
-                var username = principal.Identity.Name;
-
-
-
-                //funcionalidad
-
-                // Asignar el usuario del token al comentario
-                comentario.Autor = username;
+                
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
