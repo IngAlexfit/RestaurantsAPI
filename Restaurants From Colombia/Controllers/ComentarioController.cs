@@ -191,7 +191,8 @@ namespace Restaurants_From_Colombia.Controllers
 
                 _comentsService.RegistrarApreciacion(username, comentarioId, accion);
 
-                return Ok("like y apreciación registrada");
+                return Ok(new { message = "like y apreciación registrada" });
+
 
             }
             catch (SecurityTokenException e)
@@ -279,7 +280,8 @@ namespace Restaurants_From_Colombia.Controllers
 
                 _comentsService.RegistrarApreciacion(username, comentarioId,accion);
 
-                return Ok("Dislike  y apreciación registrada");
+                return Ok(new { message = "Dislike  y apreciación registrada" });
+
 
             }
             catch (SecurityTokenException e)
