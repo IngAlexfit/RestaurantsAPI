@@ -95,6 +95,22 @@ namespace Restaurants_From_Colombia.Services
                 _apreciacionesComentsCollection.InsertOne(apreciacion);
             }
         }
+        public void EliminarApreciacion(string username, ObjectId comentarioId, string accion)
+        {
+            var filter = Builders<ApreciacionComentario>.Filter.And(
+                Builders<ApreciacionComentario>.Filter.Eq("Usuario", username),
+                Builders<ApreciacionComentario>.Filter.Eq("ComentarioId", comentarioId),
+                Builders<ApreciacionComentario>.Filter.Eq("accion", accion)
+            );
+
+            var result = _apreciacionesComentsCollection.DeleteOne(filter);
+
+            if (result.DeletedCount == 0)
+            {
+                throw new Exception("No se encontró ninguna apreciación para eliminar");
+            }
+        }
+
 
 
     }

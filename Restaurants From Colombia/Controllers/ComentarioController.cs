@@ -161,18 +161,25 @@ namespace Restaurants_From_Colombia.Controllers
                 {
                     return NotFound($"No encontrado comentario con ID {comentarioId}");
                 }
-
-                if (_comentsService.UsuarioHaDadoLikeAComentario(username, comentarioId))
-                {
-                    return BadRequest(new { message = "El usuario ya ha dado Like" });
-                   
-
-
-                }
                 if (_comentsService.UsuarioHaDadoDiskLikeAComentario(username, comentarioId))
                 {
                     _comentsService.DecrementarDiskLike(comentarioId);
                 }
+
+                if (_comentsService.UsuarioHaDadoLikeAComentario(username, comentarioId))
+                {
+                    var accion1 = "like";
+
+                    _comentsService.DecrementarLike(comentarioId);
+
+                    _comentsService.EliminarApreciacion(username, comentarioId, accion1);
+
+                    return Ok(new { message = "Has quitado tu like" });
+
+
+
+                }
+                
 
                
 
@@ -244,18 +251,25 @@ namespace Restaurants_From_Colombia.Controllers
                 {
                     return NotFound($"No encontrado comentario con ID {comentarioId}");
                 }
-
-                if (_comentsService.UsuarioHaDadoDiskLikeAComentario(username, comentarioId))
-                {
-                    return BadRequest(new { message = "El usuario ya ha dado DisLike" });
-                }
-
                 if (_comentsService.UsuarioHaDadoLikeAComentario(username, comentarioId))
                 {
                     _comentsService.DecrementarLike(comentarioId);
 
 
                 }
+
+                if (_comentsService.UsuarioHaDadoDiskLikeAComentario(username, comentarioId))
+                {
+                    var accion1 = "dislike";
+
+                    _comentsService.DecrementarDiskLike(comentarioId);
+
+                    _comentsService.EliminarApreciacion(username, comentarioId, accion1);
+
+                    return Ok(new { message = "Has quitado tu dislike" });
+                }
+
+               
 
                 
 
